@@ -95,10 +95,7 @@ if not os.path.isfile('occurrence.txt'):
     print('Download ZIP file and extract occurrence.txt at https://www.gbif.se/ipt/archive.do?r=fishbase')
     sys.exit()
 
-#This is a huge database so dask actually loads 3-4 times quicker than normal pandas.
-#It has both numbers and letters so treating the db as a string type is the best option for now.
-
-fish_database=pd.read_csv('occurrence.txt', sep='\t', dtype=str, on_bad_lines='warn')
+fish_database=pd.read_csv('occurrence.txt', sep='\t', dtype=str)
 fish_database_year=fish_database.copy()
 fish_database_year['dateIdentified'] = pd.to_datetime(fish_database_year['dateIdentified'], errors='coerce')
 fish_database_year['dateIdentified']=fish_database_year['dateIdentified'].dt.strftime('%Y')
