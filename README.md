@@ -8,15 +8,22 @@
 Mini Project 2: Fun Graphs About Fish 
 ## Description
  
-An in-depth paragraph about your project and overview of use.
- 
+**DISCLAIMER:** There are much newer databases that contain more accurate information about the number of species of fishes as well as the countries they were found. Most of the species in this database were identified before 1999 and information is most likely outdated but this was the best freely-available fish database I could find that required no account to download.
+
+This program shows some different statistics on fish diversity using charts. 
 ## Getting Started
  
 ### Dependencies
  
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-* ex. Windows 10
-* List pip install instructions.
+You need the actual ZIP file the with database to start.
+
+
+
+Download it [here.](https://www.gbif.se/ipt/archive.do?r=fishbase)
+* ZIP file should be called 'dwca-fishbase-v4.5.zip'. Put into your directory of execution.
+* From it extract occurrence.txt, **file is over 300 MB.**
+  * If you forget, the program would send you a friendly reminder to have it in your directory anyway.
+* 
  
 ### Installing
  
@@ -46,16 +53,12 @@ ex. Dominique Pizzie
 ex. [@DomPizzie](https://twitter.com/dompizzie)
  
 ## Version History
- 
-* 0.2
-    * Various bug fixes and optimizations
-    * See [commit change]() or See [release history]()
-* 0.1
-    * Initial Release
+
+* Released as main.py
  
 ## License
  
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+This project is licensed under the GNU General Public License - see the LICENSE.md file for details
  
 ## Acknowledgments
  
