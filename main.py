@@ -56,9 +56,6 @@ class GraphFormat:
         #Make plots with percentages.
         top_10_plot = top_10.plot(kind="pie", colormap='tab20', shadow={'ox': -0.04, 'edgecolor': 'none', 'shade': 0.9}, autopct='%1.1f%%')
 
-        #Make font Times New Roman.
-        plt.rcParams["font.sans-serif"] = "Times New Roman"
-        plt.rcParams["font.family"] = "sans-serif"
         #Place title and orient the text to where it does not get cut off.
         top_10_plot.title.set_text(f'{self.title}')
         plt.tight_layout()
@@ -75,9 +72,7 @@ class GraphFormat:
         top_10 = (self.df[f'{self.x}'].value_counts()).iloc[:10]
         top_10_plot=top_10.plot(kind="bar", color=["aqua","teal","cadetblue"], edgecolor="black")
         top_10_plot.bar_label(top_10_plot.containers[0])
-        #Set font to Times New Roman.
-        plt.rcParams["font.sans-serif"] = "Times New Roman"
-        plt.rcParams["font.family"] = "sans-serif"
+
         #Set x,y, and title labels.
         top_10_plot.set_ylabel(f'{self.ylabel}')
         top_10_plot.set_xlabel(f'{self.xlabel}')

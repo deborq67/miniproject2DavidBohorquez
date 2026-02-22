@@ -83,8 +83,10 @@ This project is licensed under the GNU General Public License - see the LICENSE.
  
 ## Acknowledgments
  
-* [awesome-readme](https://github.com/matiassingers/awesome-readme)
-* [PurpleBooth](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)
-* [dbader](https://github.com/dbader/readme-template)
-* [zenorocha](https://gist.github.com/zenorocha/4526327)
-* [fvcproductions](https://gist.github.com/fvcproductions/1bfc2d4aecb01a834b46)
+* [Pandas Documentation](https://pandas.pydata.org/docs/user_guide/index.html)
+* [Matplotlib Documentation](https://matplotlib.org/stable/api/matplotlib_configuration_api.html)
+* [GBIF Sweden for providing this fish data set.](https://www.gbif.org/)
+* [Stack Overflow post that helped filter orders.](https://stackoverflow.com/questions/18358938/get-row-index-values-of-pandas-dataframe-as-list)
+* [This other post also assisted immensely in filtering orders.](https://stackoverflow.com/questions/17071871/how-do-i-select-rows-from-a-dataframe-based-on-column-values)
+* [This source helped make the subset for the line graph.](https://stackoverflow.com/questions/35268817/unique-combinations-of-values-in-selected-columns-in-pandas-data-frame-and-count)
+* 
