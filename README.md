@@ -28,7 +28,7 @@ This program was made using Python 3.13.11.
  
 ### Dependencies
  
-You need the actual ZIP file the with database to start.
+You need the actual ZIP file with the database to start.
 
 Download it [here.](https://www.gbif.se/ipt/archive.do?r=fishbase)
 
