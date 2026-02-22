@@ -158,7 +158,7 @@ GraphFormat(fish_database_unique_species,'order', title = 'Top 5 Fish Orders wit
 
 GraphFormat(fish_database_unique_country,'country', title='Countries with the Most Species', xlabel='Country', ylabel='Species Count').bar_chart_top_10()
 
-#Q3: Since 1980, what orders were the ost frequently identified?
+#Q3: Since 1980, what orders were the most frequently identified by year?
 
 '''The line graphs were a bit more complex and I could not think of
 any good way to write functions for them. Here is how they were made:'''
