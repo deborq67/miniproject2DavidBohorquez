@@ -22,11 +22,9 @@ import pandas as pd
 import os
 import sys
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import xlabel
 
 #First step: Make charts folder with a single command:
 os.makedirs(name="charts/", exist_ok=True)
-
 
 '''This class handles most of the aesthetics of my graphs, meaning all I
 have to do is put in the mandatory information like title, x, and y fields.
@@ -44,33 +42,56 @@ class GraphFormat:
 #Get Top 10 items of a column and turn it into a pie chart.
 
     def pie_chart_top_10(self):
+        #Get Top 10 of X
         top_10 = (self.df[f'{self.x}'].value_counts()).iloc[:10]
-        top_10_plot = top_10.plot(kind="pie", colormap='tab20c', shadow=True)
+        top_10_plot = top_10.plot(kind="pie", colormap='tab20c', shadow={'ox': -0.04, 'edgecolor': 'none', 'shade': 0.9}, autopct='%1.1f%%')
+        #Make font Times New Roman.
+        plt.rcParams["font.sans-serif"] = "Times New Roman"
+        plt.rcParams["font.family"] = "sans-serif"
+        #Place title and orient the text to where it does not get cut off.
         top_10_plot.title.set_text(f'{self.title}')
         plt.tight_layout()
-        plt.show()
+        #Save plot as your title into "charts".
+        top_10_plot.get_figure().savefig("charts/"+f'{self.title}.png')
+        #Close the graph to prevent interference.
+        plt.close()
         return top_10
 
 #Now do a bar chart.
 
     def bar_chart_top_10(self):
+        #Get Top 10 of X
         top_10 = (self.df[f'{self.x}'].value_counts()).iloc[:10]
         top_10_plot=top_10.plot(kind="bar", color="maroon")
+        #Set font to Times New Roman.
+        plt.rcParams["font.sans-serif"] = "Times New Roman"
+        plt.rcParams["font.family"] = "sans-serif"
+        #Set x,y, and title labels.
         top_10_plot.set_ylabel(f'{self.ylabel}')
         top_10_plot.set_xlabel(f'{self.xlabel}')
         top_10_plot.title.set_text(f'{self.title}')
         # Hide the right and top bars in the graph. Makes the graph look better.
         top_10_plot.spines[['top', 'right']].set_visible(False)
         plt.tight_layout()
-        plt.show()
         top_10_plot.get_figure().savefig("charts/"+f'{self.title}.png')
+        #Close graph here too.
+        plt.close()
+
         return top_10
+
+#This function will be a little more difficult since it now requires x and y input.
+
+    def line_chart_x_by_y(self,x,y):
+        data=self.df.plot(kind="scatter", x=f'{self.x}', y=f'{self.y}')
+        plt.show()
+        return data
+
 
 #Strips nas & whitespace, sorts them (to make sure the program is working), and
 #drops duplicate names of whatever column to ensure unique values if applicable.
 
 
-def clean_df(data, *series, uniq=False, pair=False):
+def clean_df(data, *series, uniq=False):
     #Keeps the original df from being modified, which happened to me when I saw 100,000
     #of my rows dropped because I forgot this.
     data=data.copy()
@@ -83,8 +104,24 @@ def clean_df(data, *series, uniq=False, pair=False):
         data = data.sort_values(by=name)
     #If uniq is True, drop duplicates.
     if uniq:
-        # for each series, drop duplicates or find pairs.:
+        # for each series, drop duplicates or find pairs:
         data = data.drop_duplicates(subset=series)
+    return data
+
+#Cleans time-related columns.
+
+'''NOTE: Pandas MAY give a warning in this section because the year in the column has both 2 and 4 digit
+format. Ignore it since Pandas will fix this.'''
+
+def clean_time(data, *series):
+    #Don't modify the original import.
+    data = data.copy()
+    for name in series:
+        # If field is blank, just NA it.
+        data[name] = pd.to_datetime(data[name], errors='coerce')
+        #Drop the NAs
+        data = data.dropna(subset=name)
+        data = data.sort_values(by=name)
     return data
 
 
@@ -96,11 +133,13 @@ if not os.path.isfile('occurrence.txt'):
     sys.exit()
 
 fish_database=pd.read_csv('occurrence.txt', sep='\t', dtype=str)
-fish_database_year=fish_database.copy()
-fish_database_year['dateIdentified'] = pd.to_datetime(fish_database_year['dateIdentified'], errors='coerce')
-fish_database_year['dateIdentified']=fish_database_year['dateIdentified'].dt.strftime('%Y')
+
+#Make 2 databases
 fish_database_unique_species=clean_df(fish_database,'scientificName', uniq=True)
 fish_database_unique_country=clean_df(fish_database,'scientificName','country', uniq=True)
+
+#For the purpose of my third graph, I will also make a third database based on the cleaned species
+fish_time=clean_time(fish_database_unique_species,'dateIdentified')
 
 #Q1: What fish orders have the most species
 
@@ -109,11 +148,24 @@ fish_database_unique_country=clean_df(fish_database,'scientificName','country', 
   the order Siluriformes.'''
 
 # print(fish_database['country'].value_counts(dropna=False))
-print(fish_database_unique_species['country'].value_counts())
-print(fish_database_unique_country['country'].value_counts())
+# print(fish_database_unique_species['country'].value_counts())
+# print(fish_database_unique_country['country'].value_counts())
 # print(fish_database_year['dateIdentified'].value_counts())
 # print(f"Raw Count: {len(fish_database)}")
 
 #Make labels by arguments, very similar to how you would on R graphs.
 GraphFormat(fish_database_unique_species,'order', title = 'Fish Orders with the Most Members' ).pie_chart_top_10()
 GraphFormat(fish_database_unique_country,'country', title='Countries with the Most Species', xlabel='Country', ylabel='Species Count').bar_chart_top_10()
+
+# fish_time['ID_Year_Counts'] = fish_time['dateIdentified','order'].value_counts()
+# fish_time['ID_Year_Total'] = fish_time.groupby(['dateIdentified'])['dateIdentified'].transform('count')
+
+# print(fish_database_unique_species)
+
+fish_time=fish_time.groupby(['dateIdentified','order']).size().reset_index().rename(columns={0:'ID_Year_Counts'})
+
+print(fish_time.tail(n=20))
+
+
+
+# plt.show()
