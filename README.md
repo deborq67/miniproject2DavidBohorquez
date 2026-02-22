@@ -46,7 +46,6 @@ pip install -r requirements.txt
  
 * First, download `dwca-fishbase-v4.5.zip` and extract `occurrence.txt` from it in the directory of execution. 
 * Download `main.py` and `requirements.txt` file. Keep them both in the same directory as `occurrence.txt`.
-* Alternatively, you could download the ZIP and use the extracted directory as `occurrence.txt`.
 * Run the command listed on the **Dependencies** section if you have not done so already.
 * Depending on how your Python installation is set up, execute from the directory either of these commands:
 ```
