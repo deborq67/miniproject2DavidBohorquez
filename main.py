@@ -3,7 +3,6 @@
 # Mini Project 2
 
 # This project will be using Pandas dataframes. This isn't intended to be full blown data science project. The goal here is to come up with some question and then see what API or datasets you can use to get the information needed to answer that question. This will get you familiar with working with datasets and asking questions, researching APIs and gathering datasets. If you get stuck here, please email me!
-
 # (5/5 points) Initial comments with your name, class and project at the top of your .py file.
 # (5/5 points) Proper import of packages used.
 # (20/20 points) Using a data source of your choice, such as data from data.gov or using the Faker package, generate or retrieve some data for creating basic statistics on. This will generally come in as json data, etc.
@@ -41,10 +40,22 @@ class GraphFormat:
 
 #Get Top 10 items of a column and turn it into a pie chart.
 
-    def pie_chart_top_10(self):
-        #Get Top 10 of X
-        top_10 = (self.df[f'{self.x}'].value_counts()).iloc[:10]
-        top_10_plot = top_10.plot(kind="pie", colormap='tab20c', shadow={'ox': -0.04, 'edgecolor': 'none', 'shade': 0.9}, autopct='%1.1f%%')
+    def pie_chart_top_5(self):
+        #Get Top 5 of a series, everything else as your x-label
+        #First, get counts of everything
+        top_counts = (self.df[f'{self.x}'].value_counts())
+
+        #Prevent df from getting modified.
+        top_counts = top_counts.copy()
+
+        #From those counts, get the Top 10 results, combine lower results into 1 slice:
+        top_10 = top_counts.iloc[:5]
+        misc_10 = top_counts.iloc[5:].sum()
+        top_10[f'{self.xlabel}'] = misc_10
+
+        #Make plots with percentages.
+        top_10_plot = top_10.plot(kind="pie", colormap='tab20', shadow={'ox': -0.04, 'edgecolor': 'none', 'shade': 0.9}, autopct='%1.1f%%')
+
         #Make font Times New Roman.
         plt.rcParams["font.sans-serif"] = "Times New Roman"
         plt.rcParams["font.family"] = "sans-serif"
@@ -131,18 +142,19 @@ fish_database=pd.read_csv('occurrence.txt', sep='\t', dtype=str)
 fish_database_unique_species=clean_df(fish_database,'scientificName', uniq=True)
 fish_database_unique_country=clean_df(fish_database,'scientificName','country', uniq=True)
 
-#Q1: What fish orders have the most species
+#Q1: What fish orders have the most species?
 
 '''For some taxonomical context, orders are big groups of organisms with common traits.
   For example, butterflies and moths belong in the order Lepidoptera. Catfish belong in
   the order Siluriformes.'''
 
-#Make labels by arguments, very similar to how you would on R graphs.
-GraphFormat(fish_database_unique_species,'order', title = 'Fish Orders with the Most Members Within the Top 10' ).pie_chart_top_10()
+#Make labels by arguments, very similar to how you would on R using ggplot2.
+
+GraphFormat(fish_database_unique_species,'order', title = 'Top 5 Fish Orders with the Most Members', xlabel='Other Orders' ).pie_chart_top_5()
 
 #Q2: What countries have the most species diversity?
 
-#Same logic as the Q1 graph:
+#Same logic as the first graph:
 
 GraphFormat(fish_database_unique_country,'country', title='Countries with the Most Species', xlabel='Country', ylabel='Species Count').bar_chart_top_10()
 
@@ -163,17 +175,39 @@ fish_time=fish_time.groupby(['dateIdentified','order']).size().reset_index().ren
 #Only extract data after 1980.
 
 top_5_orders=fish_time['order'].value_counts().iloc[:5]
+#After counting, get list of all orders in index.
 top_5_orders=list(top_5_orders.index.values)
+#Extract rows with only the orders in the list, then filter only 1980 onward.
 fish_time=fish_time.loc[fish_time['order'].isin(top_5_orders)]
 fish_time =fish_time[fish_time['dateIdentified'] >= '1980-01-01']
 
-print(fish_time)
-
-#This part took me the longest to solve: the orders have to be turned into columns to plot them in 1 graph.
+#This part took me the longest to solve: the order themselves have to be turned into columns to plot them in 1 graph.
 
 fish_time=fish_time.pivot(index="dateIdentified", columns="order", values="ID_Year_Count")
 
-ax=fish_time.plot(kind='line')
-plt.show()
+#Fill NaNs with 0 so lines do not appear broken.
 
-print(fish_time.columns)
+fish_time = fish_time.fillna(0)
+
+#Make the line graph.
+
+ax=fish_time.plot(color=["aqua","teal","cadetblue","dodgerblue","deepskyblue"])
+
+#Hide top and right lines for visual appeal. Make the lines touch the bottom and left.
+
+ax.spines[['top', 'right']].set_visible(False)
+ax.spines['bottom'].set_position('zero')
+ax.spines['left'].set_bounds(0,max(fish_time.max())+1)
+
+#Put legend on the top left of graph and put a title for it and the graph.
+
+ax.legend(loc='upper left', title='Fish Orders')
+graph_title=ax.title.set_text('Identified Species per Year by Top 5 Fish Orders')
+ax.set_xlabel("")
+ax.set_ylabel("Total Unique Species Identified")
+
+#Take off minor ticks for visual appeal.
+ax.minorticks_off()
+
+#Save the final graph.
+ax.get_figure().savefig("charts/"+ax.get_title()+'.png')
