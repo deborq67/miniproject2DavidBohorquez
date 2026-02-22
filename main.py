@@ -62,7 +62,8 @@ class GraphFormat:
     def bar_chart_top_10(self):
         #Get Top 10 of X
         top_10 = (self.df[f'{self.x}'].value_counts()).iloc[:10]
-        top_10_plot=top_10.plot(kind="bar", color="maroon")
+        top_10_plot=top_10.plot(kind="bar", color=["aqua","teal","cadetblue"], edgecolor="black")
+        top_10_plot.bar_label(top_10_plot.containers[0])
         #Set font to Times New Roman.
         plt.rcParams["font.sans-serif"] = "Times New Roman"
         plt.rcParams["font.family"] = "sans-serif"
@@ -78,14 +79,6 @@ class GraphFormat:
         plt.close()
 
         return top_10
-
-#This function will be a little more difficult since it now requires x and y input.
-
-    def line_chart_x_by_y(self,x,y):
-        data=self.df.plot(kind="scatter", x=f'{self.x}', y=f'{self.y}')
-        plt.show()
-        return data
-
 
 #Strips nas & whitespace, sorts them (to make sure the program is working), and
 #drops duplicate names of whatever column to ensure unique values if applicable.
@@ -138,34 +131,49 @@ fish_database=pd.read_csv('occurrence.txt', sep='\t', dtype=str)
 fish_database_unique_species=clean_df(fish_database,'scientificName', uniq=True)
 fish_database_unique_country=clean_df(fish_database,'scientificName','country', uniq=True)
 
-#For the purpose of my third graph, I will also make a third database based on the cleaned species
-fish_time=clean_time(fish_database_unique_species,'dateIdentified')
-
 #Q1: What fish orders have the most species
 
 '''For some taxonomical context, orders are big groups of organisms with common traits.
   For example, butterflies and moths belong in the order Lepidoptera. Catfish belong in
   the order Siluriformes.'''
 
-# print(fish_database['country'].value_counts(dropna=False))
-# print(fish_database_unique_species['country'].value_counts())
-# print(fish_database_unique_country['country'].value_counts())
-# print(fish_database_year['dateIdentified'].value_counts())
-# print(f"Raw Count: {len(fish_database)}")
-
 #Make labels by arguments, very similar to how you would on R graphs.
-GraphFormat(fish_database_unique_species,'order', title = 'Fish Orders with the Most Members' ).pie_chart_top_10()
+GraphFormat(fish_database_unique_species,'order', title = 'Fish Orders with the Most Members Within the Top 10' ).pie_chart_top_10()
+
+#Q2: What countries have the most species diversity?
+
+#Same logic as the Q1 graph:
+
 GraphFormat(fish_database_unique_country,'country', title='Countries with the Most Species', xlabel='Country', ylabel='Species Count').bar_chart_top_10()
 
-# fish_time['ID_Year_Counts'] = fish_time['dateIdentified','order'].value_counts()
-# fish_time['ID_Year_Total'] = fish_time.groupby(['dateIdentified'])['dateIdentified'].transform('count')
+#Q3: Since 1980, what orders were the ost frequently identified?
 
-# print(fish_database_unique_species)
+'''The line graphs were a bit more complex and I could not think of
+any good way to write functions for them. Here is how they were made:'''
 
-fish_time=fish_time.groupby(['dateIdentified','order']).size().reset_index().rename(columns={0:'ID_Year_Counts'})
+#Make a third database based on the cleaned species.
 
-print(fish_time.tail(n=20))
+fish_time=clean_time(fish_database_unique_species,'dateIdentified')
 
+#Make a subset with a count of each combination of year and order, call it ID_Year_Count.
 
+fish_time=fish_time.groupby(['dateIdentified','order']).size().reset_index().rename(columns={0:'ID_Year_Count'})
 
-# plt.show()
+#Extract only the top 5 orders in the table; in other words, the ones with the most data points.
+#Only extract data after 1980.
+
+top_5_orders=fish_time['order'].value_counts().iloc[:5]
+top_5_orders=list(top_5_orders.index.values)
+fish_time=fish_time.loc[fish_time['order'].isin(top_5_orders)]
+fish_time =fish_time[fish_time['dateIdentified'] >= '1980-01-01']
+
+print(fish_time)
+
+#This part took me the longest to solve: the orders have to be turned into columns to plot them in 1 graph.
+
+fish_time=fish_time.pivot(index="dateIdentified", columns="order", values="ID_Year_Count")
+
+ax=fish_time.plot(kind='line')
+plt.show()
+
+print(fish_time.columns)
