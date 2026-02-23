@@ -88,3 +88,4 @@ This project is licensed under the GNU General Public License - see the LICENSE.
 * [Stack Overflow post that helped filter orders.](https://stackoverflow.com/questions/18358938/get-row-index-values-of-pandas-dataframe-as-list)
 * [This other post also assisted immensely in filtering orders.](https://stackoverflow.com/questions/17071871/how-do-i-select-rows-from-a-dataframe-based-on-column-values)
 * [This source helped make the subset for the line graph.](https://stackoverflow.com/questions/35268817/unique-combinations-of-values-in-selected-columns-in-pandas-data-frame-and-count)
+* [Beyond the Basic Stuff with Python helped immensely in understanding class which was then applied to my script.](https://inventwithpython.com/beyond/chapter15.html)
